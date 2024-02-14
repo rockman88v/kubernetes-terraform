@@ -44,7 +44,7 @@ Cấu hình tham số ở file `kubernetes/terraform.tfvars`:
 ## Thực hiện cài đặt
 Cài đặt lab trên AWS:
 ````bash
-cd kubernetes-on-ec2-with-terraform/kubernetes
+cd kubernetes-with-terraform/kubernetes
 terraform init
 terraform plan
 terraform apply --auto-approve
@@ -63,7 +63,7 @@ worker_node_public_ip = [
 
 Xóa lab trên AWS:
 ````bash
-cd kubernetes-on-ec2-with-terraform/kubernetes
+cd kubernetes-terraform/kubernetes
 terraform destroy --auto-approve
 ````
 ## Kết quả
