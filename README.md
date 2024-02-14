@@ -44,7 +44,7 @@ Cấu hình tham số ở file `kubernetes/terraform.tfvars`:
 ## Thực hiện cài đặt
 Cài đặt lab trên AWS:
 ````bash
-cd kubernetes-with-terraform/kubernetes
+cd kubernetes-terraform/kubernetes
 terraform init
 terraform plan
 terraform apply --auto-approve
