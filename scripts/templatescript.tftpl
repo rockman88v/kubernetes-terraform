@@ -1,0 +1,9 @@
+#!/bin/bash
+
+sudo apt-get update
+
+%{ for script in script_list ~}
+
+${script}
+
+%{ endfor ~}
