@@ -1,5 +1,5 @@
-cluster_prefix                = "viettq"
-keypair_name                = "viettq-key"
+cluster_prefix              = "evn-viettq"
+keypair_name                = "cecomtech"
 master_instance_type        = "t3.small"
 worker_instance_type        = "t3.small"
 master_instance_name        = "master"
@@ -7,7 +7,8 @@ worker_instance_name        = "worker"
 region                      = "ap-southeast-1"
 number_of_workers           = "2"
 
-included_components         = ["haproxy", "argocd", "ingress-controller", "ebs-storageclass", "platform-app"]
+included_components         = ["haproxy", "argocd", "ingress-controller", "ebs-storageclass"]
+#included_components         = ["haproxy"]
 # haproxy           : Install haproxy on master node and setup rule to kubernete ingress backend
 # argocd            : Install argocd on installed kubernetes cluster using helm-chart
 # ingress-controller: Install ingress-controller on installed kubernetes cluster using helm-chart

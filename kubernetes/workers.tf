@@ -1,17 +1,13 @@
 ## To use template_file, you will need to use template provider
 
 locals {
-  #cluster_name         = var.cluster_name
-  #cluster_prefix       = var.cluster_prefix
   worker_instance_type = var.worker_instance_type
   worker_instance_name = var.worker_instance_name  
   worker_keypair       = var.keypair_name
-  #worker_name          = var.worker_instance_name
   number_of_workers    = var.number_of_workers
 }
 
-#   # You can put some variable here to render
-# }
+
 
 module "workers" {
   source = "../modules/ec2"  
@@ -37,5 +33,15 @@ resource "aws_ssm_parameter" "k8s_worker_hostname" {
   name = element(module.workers.instance_private_ips, count.index)
   type      = "String"
   value     = "${local.cluster_prefix}-${local.worker_instance_name}-${count.index + 1}"
+  overwrite = true
+}
+
+#The cluster-prefix is broadcast to all nodes by setting a SSM Param as the format: privateIP-cluster-prefix
+#So that from every node can get this SSM Param because it know its private IP
+resource "aws_ssm_parameter" "k8s_worker_cluster_info" {
+  count     = local.number_of_workers
+  name      = "${element(module.workers.instance_private_ips, count.index)}-cluster-prefix"
+  type      = "String"
+  value     = "${local.cluster_prefix}"
   overwrite = true
 }

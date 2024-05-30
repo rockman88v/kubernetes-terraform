@@ -88,25 +88,17 @@ resource "aws_iam_role_policy_attachment" "EBSCSIDriver-policy-attach" {
 module "control_plane" {
   source = "../modules/ec2"
   ami    = data.aws_ami.ubuntu_ami.id
-  // Usage of template has been deprecated.
-  # bootstrap_script = data.template_file.control_plane_user_data.rendered
-# ["haproxy", "argocd", "ingress-controller", "ebs-storageclass", "platform-app"]
+  
   bootstrap_script = templatefile("../scripts/templatescript.tftpl", {
     script_list : [
-      contains(local.included_components, "haproxy") ? templatefile("../scripts/haproxy/install-haproxy.sh", {}) : "",
-      #templatefile("../scripts/haproxy/install-haproxy.sh", {}),      
+      contains(local.included_components, "haproxy") ? templatefile("../scripts/haproxy/install-haproxy.sh", {}) : "",      
       templatefile("../scripts/k8s/install-core-components.sh", {}),
-      templatefile("../scripts/k8s/init-cluster.sh", {}),
-      #contains(local.included_components, "argocd") ? templatefile("../scripts/argocd.sh", {}) : "",
+      templatefile("../scripts/k8s/init-cluster.sh", {}),      
       templatefile("../scripts/k8s/configure-kubectl.sh", {}),
-      #templatefile("../scripts/install-platform-apps/install-argocd.sh", {}),
       contains(local.included_components, "argocd") ? templatefile("../scripts/install-platform-apps/install-argocd.sh", {}) : "",
-      #templatefile("../scripts/install-platform-apps/install-ingress-controller.sh", {}),
       contains(local.included_components, "ingress-controller") ? templatefile("../scripts/install-platform-apps/install-ingress-controller.sh", {}) : "",
-      #templatefile("../scripts/install-platform-apps/install-ebs-storageclass.sh", {}),  
-      contains(local.included_components, "ebs-storageclass") ? templatefile("../scripts/install-platform-apps/install-ebs-storageclass.sh", {}) : "",    
-      #templatefile("../scripts/install-platform-apps/install-apps-via-argocd.sh", {}),      
-      contains(local.included_components, "ebs-storageclass") ? templatefile("../scripts/install-platform-apps/install-apps-via-argocd.sh", {}) : "",    
+      contains(local.included_components, "ebs-storageclass") ? templatefile("../scripts/install-platform-apps/install-ebs-storageclass.sh", {}) : "",
+      contains(local.included_components, "platform-app") ? templatefile("../scripts/install-platform-apps/install-apps-via-argocd.sh", {}) : "",    
     ]
   })
 
@@ -120,17 +112,20 @@ module "control_plane" {
   cluster_prefix     = local.cluster_prefix
 }
 
-
-resource "aws_ssm_parameter" "k8s_cluster_join_command" {
-  name  = "k8s_join_command"
-  type  = "String"
-  value = "NULL"
+#This is to add cluster-prefix for the cluster-join-command so we can create multiple cluster at the same time without any overrides
+#This SSM Param is set in the bootstrap script in master node after init the k8s cluster
+resource "aws_ssm_parameter" "cluster_join" {  
+  name = "${local.cluster_prefix}-join-cluster"
+  type      = "String"
+  value     = "NULL"
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "ec2_az" {
-  name  = "ec2_az"
-  type  = "String"
-  value = element(module.control_plane.instance_az,0)
+#The cluster-prefix is broadcast to all nodes by setting a SSM Param as the format: privateIP-cluster-prefix
+#So that from every node can get this SSM Param because it know its private IP
+resource "aws_ssm_parameter" "k8s_master_cluster_info" {  
+  name      = "${module.control_plane.instance_private_ips[0]}-cluster-prefix"
+  type      = "String"
+  value     = "${local.cluster_prefix}"
   overwrite = true
 }
