@@ -2,6 +2,26 @@ echo "#############################"
 echo "install-core-components.sh"
 echo "===== install aws-cli ====="
 sudo apt install unzip -y
+which unzip
+if [ $? -eq 0 ]; then
+    echo "Unzip installed successfully."
+else
+    echo "Unzip installation failed. Retrying..."
+    for i in {1..10}; do
+        sudo apt install unzip -y
+        which unzip
+        if [ $? -eq 0 ]; then
+            echo "Unzip installed successfully."
+            break
+        else
+            echo "Retrying in 5 seconds..."
+            sleep 5
+        fi
+    done
+fi
+
+
+
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -qq awscliv2.zip
 sudo ./aws/install
@@ -25,6 +45,23 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install containerd.io -y
+
+if [ $? -eq 0 ]; then
+    echo "containerd installed successfully."
+else
+    echo "containerd installation failed. Retrying..."
+    for i in {1..10}; do
+        sudo apt-get install containerd.io -y
+        if [ $? -eq 0 ]; then
+            echo "containerd installed successfully."
+            break
+        else
+            echo "Retrying in 5 seconds..."
+            sleep 5
+        fi
+    done
+fi
+
 #cd ~/
 #wget https://github.com/opencontainers/runc/releases/download/v1.1.2/runc.amd64
 #sudo install -m 755 runc.amd64 /usr/local/sbin/runc
@@ -40,6 +77,44 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
+
+sudo kubeadm version
+if [ $? -eq 0 ]; then
+    echo "kubeadm installed successfully."
+else
+    echo "kubeadm installation failed. Retrying..."
+    for i in {1..10}; do
+        sudo apt-get install -y kubeadm
+        sudo kubeadm version
+        if [ $? -eq 0 ]; then
+            echo "kubeadm installed successfully."
+            break
+        else
+            echo "Retrying in 5 seconds..."
+            sleep 5
+        fi
+    done
+fi
+
+sudo kubelet --version
+if [ $? -eq 0 ]; then
+    echo "kubelet installed successfully."
+else
+    echo "kubelet installation failed. Retrying..."
+    for i in {1..10}; do
+        sudo apt-get install -y kubelet
+        sudo kubelet --version
+        if [ $? -eq 0 ]; then
+            echo "kubelet installed successfully."
+            break
+        else
+            echo "Retrying in 5 seconds..."
+            sleep 5
+        fi
+    done
+fi
+
+
 sudo apt-mark hold kubelet kubeadm kubectl
 
 echo "===== configure containerd ====="
