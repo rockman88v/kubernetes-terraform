@@ -20,6 +20,7 @@ locals {
   bootstrap_script_file = try(var.bootstrap_script, file(var.bootstrap_script_file))
   security_group_ids = var.security_group_ids
   keypair_name = var.keypair_name
+  worker_disk_size = var.worker_disk_size
   # If subnet_id is not specific, then use first default subnet
   subnet_id = var.subnet_id == "" ? tolist(data.aws_subnets.default_subnets.ids)[0] : var.subnet_id
   include_role = var.ec2_role != null 
@@ -57,6 +58,10 @@ resource "aws_instance" "this" {
   network_interface {
     network_interface_id = aws_network_interface.ec2_eni[count.index].id
     device_index         = 0
+  }
+  root_block_device {
+    volume_size = var.worker_disk_size 
+    volume_type = "gp2"               
   }
 
   user_data = local.bootstrap_script

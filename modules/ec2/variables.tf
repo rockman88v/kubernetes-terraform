@@ -78,3 +78,9 @@ variable "ec2_role" {
   description = "Role name to be added into multiple ec2 instances"
   default = null
 }
+
+variable "worker_disk_size" {
+  description = "Size of the EBS volume in GiB"
+  type        = number
+  default     = 16 
+}
