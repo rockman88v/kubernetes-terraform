@@ -28,7 +28,7 @@ attempt=0
 while [ $attempt -lt $max_attempts ]; do
     if kubectl --kubeconfig /home/ubuntu/.kube/config get nodes &> /dev/null; then
         echo "kubectl get nodes succeeded."
-        kubectl --kubeconfig /home/ubuntu/.kube/config apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+        kubectl --kubeconfig /home/ubuntu/.kube/config apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/calico.yaml        
         break
     else
         echo "attempt=$attempt: kubernetes cluster is not ready yet..."
