@@ -48,3 +48,9 @@ variable "included_components" {
   description = "Select which component should be installed with the kubernetes cluster"
   default     = []
 }
+
+variable "worker_disk_size" {
+  description = "Size of the EBS volume in GiB"
+  type        = number
+  default     = 32 
+}

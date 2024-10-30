@@ -25,6 +25,7 @@ locals {
   master_instance_type = var.master_instance_type
   master_instance_name = var.master_instance_name
   included_components = var.included_components
+  worker_disk_size    = var.worker_disk_size
 }
 
 module "sg_public_ssh_http_https" {

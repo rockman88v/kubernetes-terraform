@@ -24,7 +24,8 @@ module "workers" {
   instance_type       = local.worker_instance_type
   name                = "${local.cluster_prefix}_${local.worker_instance_name}"
   number_of_instances = local.number_of_workers
-  ec2_role = aws_iam_role.k8s-node-role.name
+  ec2_role            = aws_iam_role.k8s-node-role.name
+  worker_disk_size    = local.worker_disk_size
 }
 
 #This is to set ec2's hostname same as ec2 instance name in web-console
