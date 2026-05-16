@@ -1,6 +1,15 @@
 #Update hostname before join cluster
-privateip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+TOKEN=$(curl -sX PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+privateip=$(curl -sH "X-aws-ec2-metadata-token: $TOKEN" \
+  "http://169.254.169.254/latest/meta-data/local-ipv4")
+
+echo "Private IP: $privateip"
+
 hostname=$(aws ssm get-parameter --name $privateip --output text --query "Parameter.Value")
+
+echo "hostname: $hostname"
 sudo hostnamectl set-hostname $hostname
 clusterPrefix=$(aws ssm get-parameter --name $privateip-cluster-prefix --output text --query "Parameter.Value")
 
